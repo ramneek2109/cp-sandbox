@@ -87,3 +87,62 @@ Caused by: java.util.concurrent.CompletionException: org.apache.kafka.common.err
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
 	at java.base/java.lang.Thread.run(Thread.java:829)
 ```
+
+###**Solution:**
+
+Regenerate certificate using steps performed in previous scenarios.
+
+Next step,
+
+Incorrect User Entries 
+
+In each broker’s server.properties file, the super.users and broker.users entries contain incorrect values. The entries use kafka-1, kafka-2, and kafka-3, but the correct identifiers are kafka1, kafka2, and kafka3. 
+
+```
+Incorrect lines: 
+
+  
+
+super.users=User:bob;User:kafka-1;User:kafka-2;User:kafka-3;User:mds;User:schemaregistryUser;User:controlcenterAdmin;User:connectAdmin 
+
+    broker.users=User:kafka-1;User:kafka-2;User:kafka-3 
+```
+
+Corrected lines:
+
+```
+super.users=User:bob;User:kafka1;User:kafka2;User:kafka3;User:mds;User:schemaregistryUser;User:controlcenterAdmin;User:connectAdmin 
+
+    broker.users=User:kafka1;User:kafka2;User:kafka3
+```
+
+Incorrect SSL Principal Mapping Rules  
+
+Another error in the server.properties file is in the ssl.principal.mapping.rules configuration. The regular expression incorrectly includes special characters (._-) in the mapping. 
+
+Incorrect line: 
+
+```  
+
+    ssl.principal.mapping.rules=RULE:^.*CN=([a-zA-Z0-9._-]*),.*$/$1/L,DEFAULT 
+```
+  
+
+Corrected line: 
+
+ ```
+    ssl.principal.mapping.rules=RULE:^.*CN=([a-zA-Z0-9]*),.*$/$1/L,DEFAULT
+```
+
+Apply these changes to the server.properties file for all brokers (kafka1, kafka2, and kafka3). 
+
+Issue resolved:
+
+![image](https://github.com/user-attachments/assets/c41ca559-dd49-468f-acc5-cf2a14d0de68)
+
+![image](https://github.com/user-attachments/assets/a907621b-17d6-4678-aeda-009fb0581d53)
+
+![image](https://github.com/user-attachments/assets/fb1c7381-1adc-49fe-883e-1208ad067e85)
+
+
+
