@@ -77,3 +77,60 @@ The error message seen in the console producer and consumer fro `domestic_orders
 WARN [Producer clientId=console-producer] Connection to node 2 (kafka2/172.20.0.6:19093) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
 ```
 
+##**Solution**
+
+
+![image](https://github.com/user-attachments/assets/aa53ab57-8847-4fc3-9040-1feab3e3b595)
+
+Regenerate the certificates using steps mentioned in previous scenarios.
+
+All the containers are up now, let's produce and consume 
+
+![image](https://github.com/user-attachments/assets/587f7b68-9f39-419e-a75c-0607f696fb8f)
+
+
+couln't see the topics and error is there in kfkclient
+
+![image](https://github.com/user-attachments/assets/5f04c665-022b-4e2f-8008-9d4220bb9af0)
+
+![image](https://github.com/user-attachments/assets/f13dcaf3-5427-4a04-85fb-5d2266400232)
+
+The logs indicate that the Kafka client is experiencing issues connecting to a specific Kafka broker, identified as node 2 (at IP 172.18.0.8:19093)
+
+**Cause**: The broker might not be configured to listen on the correct address or port. This could be due to settings in the server.properties file.
+**Solution**: Check the listeners and advertised.listeners configurations in the broker's server.properties file. Ensure that the advertised listener matches the client's connection address.
+
+In kafka2, server.properties below is the incorrect configuration:
+
+```
+listeners=CLIENT://:29092,BROKER://:29093,TOKEN://:29094
+
+# Listener name, hostname and port the broker will advertise to clients.
+# If not set, it uses the value for "listeners".
+advertised.listeners=CLIENT://kafka2:19093,BROKER://kafka2:29093,TOKEN://kafka2:29094
+```
+corrrect:
+
+```
+listeners=CLIENT://:29092,BROKER://:29093,TOKEN://:29094
+
+# Listener name, hostname and port the broker will advertise to clients.
+# If not set, it uses the value for "listeners".
+advertised.listeners=CLIENT://kafka2:29093,BROKER://kafka2:29093,TOKEN://kafka2:29094
+
+```
+
+The main issue lies in the advertised listeners. The port for the CLIENT listener in the advertised listeners (19093) does not match the port it is listening on (29092). This mismatch can prevent clients from connecting properly, especially if they are trying to connect to the advertised port.
+
+We see, topics are created now,
+
+
+![image](https://github.com/user-attachments/assets/21539023-fa7e-4356-bfaf-24c7831290ce)
+
+We are able to produce and consume from the topic domestic_orders now,
+
+![image](https://github.com/user-attachments/assets/b509f9a8-0632-4089-a304-7c387787ebe5)
+
+![image](https://github.com/user-attachments/assets/4b6b5167-cd83-4007-af4d-4b8c7b5d9149)
+
+
