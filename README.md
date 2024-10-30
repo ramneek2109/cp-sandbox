@@ -87,4 +87,31 @@ org.apache.kafka.common.config.ConfigException: Invalid value javax.net.ssl.SSLH
 	at kafka.Kafka$.main(Kafka.scala:114)
 ```
 
-###check now
+##**Solution:**
+
+![image](https://github.com/user-attachments/assets/d6b84ca2-13c2-40b3-b6ef-b8742166daa9)
+
+let's check the broker logs:
+
+![image](https://github.com/user-attachments/assets/40e9fafa-632f-45f5-9158-1bfab911cd42)
+
+1. Follow the steps in scenario 6 to regenerate certificates.
+
+
+Now, error logs of broker:
+
+![image](https://github.com/user-attachments/assets/48634fa9-0cda-4d30-bb44-c89dea2d19fa)
+
+While generating the certificates, kafka-broker was the password which has been provided, so in server.properties file, password mention is kafka-training, you need to change it.
+
+updated:
+
+```
+ssl.keystore.password=kafka-broker
+ssl.key.password=kafka-broker
+confluent.metrics.reporter.ssl.keystore.password=kafka-broker
+confluent.metrics.reporter.ssl.key.password=kafka-broker
+
+```
+
+
