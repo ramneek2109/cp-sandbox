@@ -58,8 +58,41 @@ docker-compose up -d --force-recreate <service_name> # docker-compose up -d --fo
 1. Start the scenario with `docker-compose up -d`
 2. Wait for all services to be up and healthy `docker-compose ps`
 
-## Problem Statement
+## Problem Statement:
 
 The client notices that the connect cluster is down on control-center(localhost:9021). This is after an security audit removed some users from the super users list.
 
 Troubleshoot and provide a secure solution for the client.
+
+## Solution:
+
+![image](https://github.com/user-attachments/assets/449b00ef-2181-4790-9573-caa56e0b0eaa)
+
+Connect cluster is down. 
+
+![image](https://github.com/user-attachments/assets/466513ad-9fb7-4447-8680-417c446da829)
+
+Connect logs:
+
+![image](https://github.com/user-attachments/assets/cd5c1a94-135f-4412-be78-f861e9e65035)
+
+We have authorisation issue. 
+
+
+Adding connectAdmin to the super.users list in server.properties means that Kafka will grant this LDAP user unrestricted access. When connectAdmin connects to the Kafka cluster, LDAP verifies the credentials, and Kafka grants superuser privileges based on the super.users configuration.
+If connectAdmin is missing in super.users, then, even though LDAP can authenticate connectAdmin, Kafka will still deny certain actions due to insufficient permissions, which could lead to the failure of the Kafka Connect service.
+
+We have added , connectAdmin user to superUser list:
+
+super.users=User:bob;User:kafka1;User:kafka2;User:kafka3;User:mds;User:schemaregistryUser;User:controlcenterAdmin;User:connectAdmin
+
+Now the connect container is up:
+
+
+![image](https://github.com/user-attachments/assets/93ac52f0-bd92-479f-a50e-b38e4f4ef148)
+
+![image](https://github.com/user-attachments/assets/5ad40650-7e63-4463-a423-5c7a6ee3b64c)
+
+
+
+
